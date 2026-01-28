@@ -1,0 +1,6 @@
+#define BOARD_SCREEN_COMBO 502 // 7.5 inch monochrome ePaper Screen （UC8179）
+
+#define USE_PARTIAL_EPAPER
+#define USE_MUTIGRAY_EPAPER
+#define GRAY_LEVEL4 4
+#define USE_XIAO_EPAPER_DISPLAY_BOARD_EE04
