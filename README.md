@@ -6,3 +6,5 @@ Or, it can display an image served from a personal host on the network, which re
 I would have used espHome (for a lot of reasons) but it can't handle grayscale, and it makes a huge difference. 
 
 I didn't include my secrets.h or keys.py (for obvious reasons), if you actually want to use this repository email me and if you can't figure out what's required I'll help you set it up (because I hate writing docs). 
+
+GenAI helped me write this library, as it does for most code these days, but it was mostly me. 
