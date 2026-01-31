@@ -105,7 +105,7 @@ HAText haURL = HAText("aux_url","Aux URL",ha_device,150);
 HAButton haRefreshButton = HAButton("refresh_button","Refresh Page",ha_device);
 HASensorNumeric haBatteryVoltage = HASensorNumeric("battery_voltage","Battery Voltage",ha_device,"V",2);
 HASensorNumeric haBatteryState = HASensorNumeric("battery_state","Battery State",ha_device,"%",0);
-// HASensorBinary haDeepSleepActive = HASensorBinary("deep_sleep_active","Deep Sleep Active");
+// HASensorBinary haDeepSleepActive = HAButton("deep_sleep_active","Deep Sleep Active");
 // HASensorBinary haDeviceOnline = HASensorBinary("device_online","Device Online");
 
 
@@ -458,11 +458,7 @@ void downloadAndConvertBMP(const char* url) {
     }
 
     Serial.println("BMP streamed and converted to 4-bit buffer");
-    if (client.connected()) {
-        http.end();  // safe
-    } else {
-        Serial.println("Client disconnected, skipping http.end()");
-    }
+    http.end();  // safe
 }
 void updateScreenInChunks(int chunkSize) {
     for (int y = 0; y < DST_H; y += chunkSize) {
@@ -485,21 +481,21 @@ void addBatteryIndicator()
     uint16_t iconHeight=50,iconWidth = 50;
     uint16_t* icon;
     switch(batteryStatus){
-        case BATT_FULL:
-            iconWidth = battery_charging_iconWidth;
-            iconHeight = battery_charging_iconHeight;
-            icon = (uint16_t*) battery_charging;
-            break;
-        case BATT_GOOD:
-            iconWidth = battery_90_iconWidth;
-            iconHeight = battery_90_iconHeight;
-            icon = (uint16_t*) battery_90;
-            break;
-        case BATT_MEDIUM:
-            iconWidth = battery_50_iconWidth;
-            iconHeight = battery_50_iconHeight;
-            icon = (uint16_t*) battery_50;
-            break;
+        // case BATT_FULL:
+        //     iconWidth = battery_charging_iconWidth;
+        //     iconHeight = battery_charging_iconHeight;
+        //     icon = (uint16_t*) battery_charging;
+        //     break;
+        // case BATT_GOOD:
+        //     iconWidth = battery_90_iconWidth;
+        //     iconHeight = battery_90_iconHeight;
+        //     icon = (uint16_t*) battery_90;
+        //     break;
+        // case BATT_MEDIUM:
+        //     iconWidth = battery_50_iconWidth;
+        //     iconHeight = battery_50_iconHeight;
+        //     icon = (uint16_t*) battery_50;
+        //     break;
         case BATT_LOW:
             iconWidth = battery_30_iconWidth;
             iconHeight = battery_30_iconHeight;
@@ -511,10 +507,13 @@ void addBatteryIndicator()
             icon = (uint16_t*) battery_10;
             break;
     }
-    uint16_t xpos = TFT_WIDTH-(15+iconWidth);
-    uint16_t ypos = TFT_HEIGHT-(15+iconWidth);
-    epaper.fillCircle(xpos+(iconWidth/2), ypos+(iconHeight/2), iconHeight, TFT_GRAY_0);
-    epaper.pushImage(xpos,ypos,iconWidth,iconHeight, icon);
+    if(icon != NULL)
+    {
+        uint16_t xpos = TFT_WIDTH-(15+iconWidth);
+        uint16_t ypos = TFT_HEIGHT-(15+iconWidth);
+        epaper.fillCircle(xpos+(iconWidth/2), ypos+(iconHeight/2), iconHeight, TFT_GRAY_0);
+        epaper.pushImage(xpos,ypos,iconWidth,iconHeight, icon);
+    }
 }
 
 /*
@@ -822,6 +821,7 @@ void updateDisplay()
 void checkMqtt()
 {
     if(WiFi.status() == WL_CONNECTED && !HAMQTT.connected()) {
+        Serial.println("Connecting to MQTT");
          if( HAMQTT.connect("Device",MQTT_USER,MQTT_PASSWORD))
             Serial.println("Connected to MQTT");
          else
