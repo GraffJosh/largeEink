@@ -20,6 +20,10 @@ This project drives a large e-ink display with WiFi connectivity, Home Assistant
     - `BUTTON_3_PIN` (D4): Previous page
     - `BATTERY_PIN` (GPIO1): Battery voltage ADC input
     - `ADC_EN_PIN` (GPIO6): ADC enable control
+## Installation Example:
+<img width="682" height="748" alt="image" src="https://github.com/user-attachments/assets/0463f124-52ee-4d37-9273-436bdb84fe69" />
+<img width="1296" height="1081" alt="image" src="https://github.com/user-attachments/assets/5a092b0b-cf0b-4783-8531-a94d558e57ff" />
+
 
 ## Software Dependencies
 
