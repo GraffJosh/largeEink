@@ -9,6 +9,8 @@ Small project to drive a 7.5" grayscale e‑ink panel from an ESP32. Includes:
 <img width="1828" height="1376" alt="image" src="https://github.com/user-attachments/assets/ed91a1c4-4f1f-450d-97d3-73b86186e7c0" />
 <img width="1828" height="1376" alt="image" src="https://github.com/user-attachments/assets/65e2f375-635c-4912-90c1-255b1c8ad63b" />
 
+Subscript: I don't like writing docs, so genAI helped with this page. If you're reading this, and you're a human a) I'm surprised you found my project b) I'm happy to help you implement this on your project. 
+
 ## Repository layout
 - eInkDriver/  
   - eInkDriver.c — main ESP32 firmware
@@ -39,7 +41,7 @@ The script writes PROGMEM C arrays and width/height constants for each image.
 
 ## Firmware behavior
 - Downloads BMP image(s) from configured URLs, converts streamed BMP rows to 4bpp via a dithered/gamma LUT, and pushes rows to the display.
-- Maintains persistent preferences (imageCount, displayIndex, deepsleepEnabled).
+- Maintains persistent preferences (imageCount, displayIndex), Reducing unecessary flickering after deep sleep
 - Exposes MQTT/Home Assistant entities for page selection, aux URL, refresh, and battery sensors (via HA-MQTT integration).
 - Supports deep sleep wake via buttons and timer.
 
@@ -48,17 +50,12 @@ The script writes PROGMEM C arrays and width/height constants for each image.
 - Provided entities include page selection, aux URL, refresh button and battery sensors. Configure your Home Assistant MQTT discovery or use the included HA‑MQTT helper to register entities.
 
 ## Troubleshooting
-- If display init causes crashes, ensure epaper init runs before WiFi (the code already follows this).
-- BMP download: server must serve uncompressed BMP with expected resolution/pixel format. The downloader expects SRC_W×SRC_H and padded rows.
-- If ADC battery readings are wrong, tune CALIBRATION_FACTOR and ADC_REF_VOLTAGE or check wiring.
+- BMP download: server must serve uncompressed BMP with expected resolution/pixel format.
+- The driver must receive exactly 480x800 pixels image, in 8bit BMP format.
 
 ## Tips
-- Reduce image size to target resolution before converting for faster transfers.
-- Use the Python converter to pre-generate headers for static icons (icons.h).
-- Tune dither/gamma constants in eInkDriver.c (setupGammaLUT, dither strength constants) for your panel.
+- Make sure you setup your secrets file with the correct URLS and credentials for MQTT etc
 
-## License
-Repository: add a LICENSE file as desired. Default: no license specified.
-
-## Contact / Credits
-Project adapted around an ESP32 + e‑paper module. See source files for author and implementation details.
+## Future Work
+- It would be cool to do partial updates or less flickering.
+-- For example an indicator showing that it's thinking or working. 
