@@ -97,7 +97,7 @@ enum BatteryState{
 #define HA_DEVICE_ID            "smart_display_5"
 #define HA_DEVICE_FRIENDLY_NAME "7.5in Epaper Smart Display"
 
-#define ENTITIES_COUNT 1
+#define ENTITIES_COUNT 7
 HADevice ha_device = HADevice(HA_DEVICE_ID,HA_DEVICE_FRIENDLY_NAME,"1.0");
 // HANumber haPageNumber = HANumber("page_num","Page Number",ha_device,1,100,1);
 HASelect haPageSelect = HASelect("page_select","Page Select",ha_device,PAGE_NUMPAGES,select_options);
@@ -105,8 +105,8 @@ HAText haURL = HAText("aux_url","Aux URL",ha_device,150);
 HAButton haRefreshButton = HAButton("refresh_button","Refresh Page",ha_device);
 HASensorNumeric haBatteryVoltage = HASensorNumeric("battery_voltage","Battery Voltage",ha_device,"V",2);
 HASensorNumeric haBatteryState = HASensorNumeric("battery_state","Battery State",ha_device,"%",0);
-// HASensorBinary haDeepSleepActive = HAButton("deep_sleep_active","Deep Sleep Active");
-// HASensorBinary haDeviceOnline = HASensorBinary("device_online","Device Online");
+HASensorBinary haDeepSleepActive = HASensorBinary("deep_sleep_active","Deep Sleep Active");
+HASensorBinary haDeviceOnline = HASensorBinary("device_online","Device Online");
 
 
 int getPageIndexFromSelect(const char* receivedSelectState,const char** list, uint16_t listSize)
@@ -602,8 +602,8 @@ void initMqtt()
     HAMQTT.addEntity(haRefreshButton);
     HAMQTT.addEntity(haBatteryState);
     HAMQTT.addEntity(haBatteryVoltage);
-    // HAMQTT.addEntity(haDeepSleepActive);
-    // HAMQTT.addEntity(haDeviceOnline);
+    HAMQTT.addEntity(haDeepSleepActive);
+    HAMQTT.addEntity(haDeviceOnline);
 
 
     haPageSelect.setState(select_options[displayIndex]);
@@ -615,7 +615,7 @@ void initMqtt()
 void initDeepSleep()
 {
 
-    // haDeviceOnline.setState(false);
+    haDeviceOnline.setState(false);
     #define WAKE_MASK ((1ULL << BUTTON_1_PIN) | (1ULL << BUTTON_2_PIN) | 1ULL << BUTTON_3_PIN)
     esp_sleep_enable_ext1_wakeup(WAKE_MASK, ESP_EXT1_WAKEUP_ALL_LOW);
     esp_sleep_enable_timer_wakeup(deepSleepSeconds(deepSleepDurationSeconds));
@@ -713,8 +713,9 @@ void setup() {
     initWifi();
     initMqtt();
     delay(100);
-    // haDeviceOnline.setState(true);
+    haDeviceOnline.setState(true);
     startupTime = millis();
+    Serial.println("End Setup");
 }
 
 // If we're not asleep, let's run stuff at varying frequency.
