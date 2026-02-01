@@ -16,17 +16,18 @@ Subscript: I don't like writing docs, so genAI helped with this page. If you're 
   - eInkDriver.c — main ESP32 firmware
   - convertImage.py — Python tool to convert images to 4bpp C arrays
   - icons.h, secrets.h, other project files (expected)
+- imageServer/
+  - imageServer.py - serves images over HTTP to the esp32.
+  - eInkImage.py - Helper class for the image server (
 
 ## Prerequisites
 - Hardware: ESP32 board compatible with the e‑paper module used (pins in firmware), 7.5" e‑paper display.
 - Toolchain: Arduino/PlatformIO or preferred ESP32 toolchain to compile and flash the C firmware.
-- Python 3 + Pillow to run the conversion script.
+- Python 3 + associated image libraris to run the conversion script.
   - Install: pip install pillow
 
 ## Configuration
 - secrets.h — add WIFI_SSID, WIFI_PASS, MQTT_SERVER, MQTT_PORT, MQTT_USER, MQTT_PASSWORD and any URL constants (URL1, URL2, URL3, etc.).
-- Adjust pin constants in eInkDriver.c for your board if needed (battery ADC pin, ADC_EN, button pins).
-- Verify TFT / ePaper definitions (TFT_eSPI / epaper library) match your hardware.
 
 ## Using the Python image converter
 Script: convertImage.py
@@ -58,4 +59,4 @@ The script writes PROGMEM C arrays and width/height constants for each image.
 
 ## Future Work
 - It would be cool to do partial updates or less flickering.
--- For example an indicator showing that it's thinking or working. 
+  - For example an indicator showing that it's thinking or working. 
