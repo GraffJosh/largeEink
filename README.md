@@ -4,6 +4,10 @@ Small project to drive a 7.5" grayscale e‑ink panel from an ESP32. Includes:
 - An ESP32 firmware (eInkDriver.c) that fetches BMP images, converts to 4‑level grayscale with ordered dither + gamma LUT, and displays them on an e‑paper module.
 - A Python helper (convertImage.py) to convert PNG/JPEG images into 4bpp C arrays for embedding.
 - MQTT/Home Assistant integration for remote control.
+<img width="1828" height="1376" alt="image" src="https://github.com/user-attachments/assets/7144d0a4-91ab-4f0e-b830-c2c852780632" />
+<img width="1036" height="1376" alt="image" src="https://github.com/user-attachments/assets/760267c7-dc92-4262-bfc6-22c8949bd38a" />
+<img width="1828" height="1376" alt="image" src="https://github.com/user-attachments/assets/ed91a1c4-4f1f-450d-97d3-73b86186e7c0" />
+<img width="1828" height="1376" alt="image" src="https://github.com/user-attachments/assets/65e2f375-635c-4912-90c1-255b1c8ad63b" />
 
 ## Repository layout
 - eInkDriver/  
