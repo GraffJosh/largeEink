@@ -1,3 +1,5 @@
+#Pepare images to be icons displayed on the screen.
+
 #!/usr/bin/env python3
 
 from PIL import Image, ImageOps
