@@ -133,6 +133,7 @@ void ha_callback(HAEntity *entity, char *topic, byte *payload, unsigned int leng
     // else 
     if(entity == &haPageSelect)
     {
+        printf("HA Callback set %s\n",haPageSelect.getState());
         setDisplayIndex(haPageSelect.getState());
     }
     else if(entity == &haRefreshButton)
@@ -290,7 +291,6 @@ void setupGammaLUT(float gamma = 0.4) {
 #define G3  255   // white
 
 #define SNAP_THRESH 1   // +/- range to lock in (tune this!)
-#define DITHER_STRENGTH 85
 
 uint8_t ditheredLevel(uint8_t gray, int x, int y)
 {
@@ -757,29 +757,6 @@ void handleButtons(){
 }
 
 
-/* Update the display:
- *  Every sixty seconds.
- *  Or if the page just updated
- *  Or if we just booted.
- */ 
-bool shouldUpdateDisplay()
-{
-    if (freshBoot) return true;
-    if (getDisplayIndex() != displayIndex) return true;
-    if ((millis() - lastUpdateMs) > (deepSleepDurationSeconds*ticksPerSecond)) return true;
-    return false;
-}
-
-/*
- * After twenty seconds awake, let's go to sleep (if other conditions have 
- * enabled deepsleep). At writing, this happens if the battery is not at full.
- */
-bool shouldDeepSleep()
-{
-    if (!deepsleepEnabled) return false;
-    if (millis() < 20*ticksPerSecond) return false;
-    return true;
-}
 void updateDisplay()
 {
     Serial.printf("Loading Page: %s\n",select_options[getDisplayIndex()]);  
@@ -819,6 +796,35 @@ void updateDisplay()
     displayIndex = getDisplayIndex();
     lastUpdateMs = millis();
 }
+/* Update the display:
+ *  Every sixty seconds.
+ *  Or if the page just updated
+ *  Or if we just booted.
+ */ 
+bool shouldUpdateDisplay()
+{
+    if ((millis() - startupTime) < 2*ticksPerSecond) return false;
+    // The freshBoot variable makes sure we update on our first pass through if we just started.
+    if(freshBoot)
+    {
+        freshBoot = false;
+        return true;
+    }
+    if (getDisplayIndex() != displayIndex) return true;
+    if ((millis() - lastUpdateMs) > (deepSleepDurationSeconds*ticksPerSecond)) return true;
+    return false;
+}
+
+/*
+ * After twenty seconds awake, let's go to sleep (if other conditions have 
+ * enabled deepsleep). At writing, this happens if the battery is not at full.
+ */
+bool shouldDeepSleep()
+{
+    if (!deepsleepEnabled) return false;
+    if (millis() < 20*ticksPerSecond) return false;
+    return true;
+}
 void checkMqtt()
 {
     if(WiFi.status() == WL_CONNECTED && !HAMQTT.connected()) {
@@ -838,15 +844,10 @@ void checkMqtt()
     
 }
 void loop() {
-    checkMqtt();
     handleButtons();
+    checkMqtt();
     if(shouldUpdateDisplay()) updateDisplay();
     if(shouldDeepSleep()) initDeepSleep();
-    // The freshBoot variable makes sure we update on our first pass through if we just started.
-    if(freshBoot)
-    {
-        freshBoot = false;
-    }
     delay(period);
 }
 
