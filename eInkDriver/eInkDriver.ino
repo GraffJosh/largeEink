@@ -50,6 +50,7 @@ uint32_t imageCount = 0;
 uint8_t displayIndex = 0;
 bool freshBoot = true;
 bool deepsleepEnabled = false;
+bool imageUpdateComplete = true;
 uint16_t deepSleepDurationSeconds = 300;
 
 const float CALIBRATION_FACTOR = 0.968;
@@ -356,7 +357,7 @@ void downloadAndConvertBMP(const char* url) {
     
     HTTPClient http;
     Serial.println("Starting BMP Download and Conversion.");
-    http.setTimeout(30000);  // 30 seconds
+    http.setTimeout(60000);  // 30 seconds
     // http.setBufferSize(1024);  // or smaller
     http.setReuse(false);
     http.setRedirectLimit(10);
@@ -365,6 +366,7 @@ void downloadAndConvertBMP(const char* url) {
     if (code != 200) {
         Serial.printf("HTTP GET failed: %d\n", code);
         Serial.printf("Content-Length: %d\n", http.getSize());
+        Serial.printf("HTTP Code: %d\n", code);
         Serial.printf("Transfer-Encoding: %s\n", http.header("Transfer-Encoding").c_str());
         http.end();
         return;
@@ -497,9 +499,9 @@ void addBatteryIndicator()
         //     icon = (uint16_t*) battery_50;
         //     break;
         case BATT_LOW:
-            iconWidth = battery_30_iconWidth;
-            iconHeight = battery_30_iconHeight;
-            icon = (uint16_t*) battery_30;
+            iconWidth = battery_50_iconWidth;
+            iconHeight = battery_50_iconHeight;
+            icon = (uint16_t*) battery_50;
             break;
         case BATT_CRITICAL:
             iconWidth = battery_10_iconWidth;
@@ -584,7 +586,7 @@ void initWifi()
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print(".");
-        if (millis() - start > 15000) {
+        if (millis() - start > 30000) {
             initDeepSleep();
         }
     }
@@ -760,7 +762,7 @@ void handleButtons(){
 void updateDisplay()
 {
     Serial.printf("Loading Page: %s\n",select_options[getDisplayIndex()]);  
-    if(readBatteryVoltage() < 4.1)
+    if(readBatteryVoltage() < 4.2)
     {
         deepsleepEnabled = true;
         // haDeepSleepActive.setState(true);
@@ -779,7 +781,7 @@ void updateDisplay()
                 // Download and display that BMP.
                 downloadAndConvertBMP(url2);
             }
-            deepSleepDurationSeconds = 1200;
+            deepSleepDurationSeconds = 1800;
             break;
         // case PAGE_HOMEASSISTANT:
         //     // Go get a URL (homeassistant page from Puppet)
@@ -795,6 +797,7 @@ void updateDisplay()
     }
     displayIndex = getDisplayIndex();
     lastUpdateMs = millis();
+    imageUpdateComplete = true;
 }
 /* Update the display:
  *  Every sixty seconds.
@@ -803,6 +806,7 @@ void updateDisplay()
  */ 
 bool shouldUpdateDisplay()
 {
+    imageUpdateComplete = false;
     if ((millis() - startupTime) < 2*ticksPerSecond) return false;
     // The freshBoot variable makes sure we update on our first pass through if we just started.
     if(freshBoot)
@@ -812,6 +816,7 @@ bool shouldUpdateDisplay()
     }
     if (getDisplayIndex() != displayIndex) return true;
     if ((millis() - lastUpdateMs) > (deepSleepDurationSeconds*ticksPerSecond)) return true;
+    imageUpdateComplete = true;
     return false;
 }
 
@@ -822,7 +827,8 @@ bool shouldUpdateDisplay()
 bool shouldDeepSleep()
 {
     if (!deepsleepEnabled) return false;
-    if (millis() < 20*ticksPerSecond) return false;
+    if ((millis()-startupTime) < 20*ticksPerSecond) return false;
+    if (imageUpdateComplete == false) return false ;
     return true;
 }
 void checkMqtt()

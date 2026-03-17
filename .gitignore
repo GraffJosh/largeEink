@@ -1,0 +1,6 @@
+*.pyc
+keys.py
+
+/.venv/
+__pycache__
+*.egg*
